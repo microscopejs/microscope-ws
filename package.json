@@ -1,0 +1,31 @@
+{
+  "name": "microscope-ws",
+  "version": "0.1.0",
+  "description": "microscope websockets application class and hubs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/microscopejs/microscope-ws.git"
+  },
+  "keywords": [
+    "websocket",
+    "microscope",
+    "realtime"
+  ],
+  "author": "bhtz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/microscopejs/microscope-ws/issues"
+  },
+  "homepage": "https://github.com/microscopejs/microscope-ws",
+  "dependencies": {
+    "lodash": "^2.4.1",
+    "socket.io": "^1.2.1"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5"
+  }
+}
