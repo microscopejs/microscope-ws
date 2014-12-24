@@ -4,10 +4,10 @@ var utils = require('./utils');
 
 // WebSocket Hub Class
 function Hub (options) {
-    var self = this;
     options || (options = {});
     if(options.io) this.io = options.io;
-    if(!this.io){ return; }
+    if(options.namespace) this.namespace = options.namespace;
+    if(!this.io){ throw new Error('Hub class require constructor with io object'); }
 
     this.io.of(this.namespace).on('connection', this._connection.bind(this));
     this.initialize.apply(this, arguments);
@@ -16,6 +16,7 @@ function Hub (options) {
 _.extend(Hub.prototype, {
 
     namespace: '/',
+    
     initialize: function(){},
 
     onConnection: function () {
