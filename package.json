@@ -1,6 +1,6 @@
 {
   "name": "microscope-ws",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "microscope websockets application class and hubs",
   "main": "index.js",
   "scripts": {
