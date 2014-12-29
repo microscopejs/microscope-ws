@@ -4,11 +4,11 @@ var HomeHub = Hub.extend({
 
 	namespace: '/home',
 	routes:{
-		'chat message': 'handleMessage'
+		'send': 'handleMessage'
 	},
 
 	handleMessage: function (model) {
-		console.log('message: ' + model);
+		this.broadcast('sended', model);
 	}
 });
 

@@ -6,10 +6,11 @@ var utils = require('./utils');
 function Hub (options) {
     options || (options = {});
     if(options.io) this.io = options.io;
+    if(options.socket) this.socket = options.socket;
     if(options.namespace) this.namespace = options.namespace;
     if(!this.io){ throw new Error('Hub class require constructor with io object'); }
-
-    this.io.of(this.namespace).on('connection', this._connection.bind(this));
+    if(!this.socket){ throw new Error('Hub class require constructor with socket object'); }
+    this._parseRoutes();
     this.initialize.apply(this, arguments);
 }
 
@@ -18,21 +19,6 @@ _.extend(Hub.prototype, {
     namespace: '/',
     
     initialize: function(){},
-
-    onConnection: function () {
-        console.log('user connected to namespace :' + this.namespace);
-    },
-
-    onDisconnect: function () {
-        console.log('user disconnected from namespace :' + this.namespace);
-    },
-
-    _connection: function (socket) {
-        this.socket = socket;
-        this.onConnection();
-        this._parseRoutes();
-        socket.on('disconnect', this.onDisconnect.bind(this));
-    },
 
     _parseRoutes: function () {
         if(!this.routes) return;
@@ -46,6 +32,22 @@ _.extend(Hub.prototype, {
     _parseRoute: function (key) {
         if(!_.isFunction(this[this.routes[key]])) return;
         this.socket.on(key, this[this.routes[key]].bind(this));
+    },
+
+    emit: function (key, obj) {
+        this.socket.emit(key, obj);
+    },
+
+    emitToRoom: function (room, key, obj) {
+        this.socket.to(room).emit(key, obj);
+    },
+
+    broadcast: function (key, obj) {
+        this.io.of(this.namespace).emit(key, obj);
+    },
+
+    broadcastToAll: function (key, obj) {
+        this.io.sockets.emit(key, obj);  
     }
 });
 

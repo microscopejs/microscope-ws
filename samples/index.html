@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>microscopejs - MVC nodejs framework</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="http://netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+  
+  <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+  <![endif]-->
+</head>
+<body ng-app="demoApp">
+
+  <nav class="navbar navbar-default" role="navigation">
+  <div class=" container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">
+           microscope-ws
+        </a>
+      </div>
+
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+
+        <ul class="nav navbar-nav">
+          <li><a href="#"><i class="fa fa-info-circle"></i> about</a></li>
+        </ul>
+
+      </div>
+    </div>
+  </nav>
+
+  <div class="container" ng-controller="demoCtrl">
+    <div class="row">
+
+      <div>
+        <input type="text" class="form-control" id="message" placeholder="Type message" ng-model="messageToSend">
+        <button ng-click="send()" class="btn btn-default">Send</button>
+      </div>
+
+      <ul class="list-group">
+        <li ng-repeat="message in messages track by $index" class="list-group-item">
+            {{message}}
+        </li>
+      </ul>
+
+    </div>
+  </div>
+
+  <!-- librairies -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+  <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0/angular.min.js"></script>
+  <script type="text/javascript">
+
+      var socket = io('/home');
+      var demoApp = angular.module('demoApp', []);
+
+      demoApp.controller('demoCtrl', function ($scope) {
+
+          $scope.messageToSend = "";
+          $scope.messages = [];
+
+          $scope.send = function () {
+              if($scope.messageToSend){
+                socket.emit('send', $scope.messageToSend);
+                $scope.messageToSend = "";
+              }
+          };
+
+          socket.on('sended', function (m) {
+              $scope.messages.push(m);
+              $scope.$apply();
+          });
+      });
+
+  </script>
+</body>
+</html>

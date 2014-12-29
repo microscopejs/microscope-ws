@@ -12,6 +12,7 @@ var utils   = require('./utils');
  */
 function WsApplication (options) {
 	options || (options = {});
+	if(!options.server){ throw new Error('WsApplication require constructor with http server object'); }
 	this.server = options.server;
 	this.io = IO(this.server);
 	this._boot();
@@ -25,7 +26,8 @@ _.extend(WsApplication.prototype, {
 
 	initialize: function () {},
 
-	_loadModulesFromFolder: function (folderpath, options) {
+	_loadHubs: function (folderpath) {
+		var self = this;
 		var files = [];
 		try{
 			var files = fs.readdirSync(folderpath);
@@ -34,19 +36,31 @@ _.extend(WsApplication.prototype, {
 		}
 		files.forEach(function (file) {
 			if (path.extname(file) === '.js') {
-				var Module = require(folderpath + file);
-				var m = new Module(options);
+				var HubClass = require(folderpath + file);
+				self.io.of(HubClass.prototype.namespace).on('connection', function (socket) {
+					self.onConnection(HubClass.prototype.namespace);
+					var instance = new HubClass({io: self.io, socket: socket});
+					socket.on('disconnect', self.onDisconnect.bind(self, HubClass.prototype.namespace));
+				});
 			}
 		});
 	},
 
-	// boot controller & api
+	// boot hubs
 	_boot: function () {
 		for (var i = 0; i < this.hubsRoot.length; i++) {
-			var ctrlPath = path.join(this.appRoot, this.hubsRoot[i]);
-			this._loadModulesFromFolder(ctrlPath, {io: this.io});
+			var hubPath = path.join(this.appRoot, this.hubsRoot[i]);
+			this._loadHubs(hubPath);
 		};
-	}
+	},
+
+    onConnection: function (namespace) {
+        console.log('user connected to namespace : ' + namespace);
+    },
+
+    onDisconnect: function (namespace) {
+        console.log('user disconnected from namespace : ' + namespace);
+    },
 });
 
 WsApplication.extend = utils.extend;
